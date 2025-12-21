@@ -1,2 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://Meekdai.github.io/Gmeek-template</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://Meekdai.github.io/Gmeek-template</link></image><lastBuildDate>Thu, 14 Mar 2024 09:17:29 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>请接着之后的安装步骤执行</title><link>https://Meekdai.github.io/Gmeek-template/post/qing-jie-zhao-zhi-hou-de-an-zhuang-bu-zou-zhi-xing.html</link><description>如果你点击了`READM.md`的链接后，看到了这个页面，请继续之后的安装步骤执行。</description><guid isPermaLink="true">https://Meekdai.github.io/Gmeek-template/post/qing-jie-zhao-zhi-hou-de-an-zhuang-bu-zou-zhi-xing.html</guid><pubDate>Thu, 14 Mar 2024 09:15:10 +0000</pubDate></item><item><title>这是Gmeek模板仓库</title><link>https://Meekdai.github.io/Gmeek-template/post/zhe-shi-Gmeek-mo-ban-cang-ku.html</link><description>通过这个模板创建库，可以大大减少部署Gmeek博客的配置步骤。</description><guid isPermaLink="true">https://Meekdai.github.io/Gmeek-template/post/zhe-shi-Gmeek-mo-ban-cang-ku.html</guid><pubDate>Wed, 20 Dec 2023 07:42:24 +0000</pubDate></item></channel></rss>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Topmer</title><link>https://topmer.top</link><description>Collecting seashells in a corner of the web</description><copyright>Topmer</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>/avatar.svg</url><title>avatar</title><link>https://topmer.top</link></image><lastBuildDate>Sun, 21 Dec 2025 12:17:15 +0000</lastBuildDate><managingEditor>Topmer</managingEditor><ttl>60</ttl><webMaster>Topmer</webMaster><item><title>Hello world</title><link>https://topmer.top/post/1.html</link><description>&lt;!-- ##{'timestamp':1498702839,'style':'&lt;style&gt;p span{filter:blur(3px);background:rgba(200,200,200,0.3);color:rgba(0,0,0,0.5);cursor:pointer;transition:0.3s;padding:2px 5px;border-radius:4px}p span:hover{filter:blur(0);background:transparent;color:inherit}&lt;/style&gt;'}## --&gt;
+
+&lt;span&gt;第一篇帖子，先试试是否乱码&lt;/span&gt;
+
+---
+## 一、 基础 ASCII 字符（0-127）- 必测基础
+### 1.  字母与数字
+大写：A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+小写：a b c d e f g h i j k l m n o p q r s t u v w x y z
+数字：0 1 2 3 4 5 6 7 8 9
+混合：A1 b2 C3 d4 E5 f6 G7 h8 I9 j0
+
+### 2.  标点与特殊符号（含易混淆符号）
+英文标点：! ' # $ % &amp; ' ( ) * + , - . / : ; &lt; = &gt; ? @ [ \ ] ^ _ ` { | } ~
+
+易混淆对比：
+- 全角 vs 半角：，, 。</description><guid isPermaLink="true">https://topmer.top/post/1.html</guid><pubDate>Thu, 29 Jun 2017 02:20:39 +0000</pubDate></item></channel></rss>
