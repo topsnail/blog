@@ -1,6 +1,6 @@
 (function() {
     const UI_CONFIG = {
-        bodyBg: 'rgba(255, 255, 255, 0.8)', 
+        bodyBg: 'rgba(255, 255, 255, 0.85)', 
         borderRadius: '12px'
     };
 
