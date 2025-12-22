@@ -1,5 +1,5 @@
 /**
- * 123博客主题切换脚本 (theme.js)
+ * 3博客主题切换脚本 (theme.js)
  * 功能：根据当前 URL 动态注入全局背景、布局以及各页面特有的 CSS 样式。
  */
 document.addEventListener('DOMContentLoaded', function() {    
