@@ -1,5 +1,5 @@
 /**
- * 博客主题切换脚本 (zt.js) - 优化版
+ * 123博客主题切换脚本 (zt.js) - 优化版
  * 功能：根据当前页面的 URL 路径，动态注入不同的 CSS 样式。
  * 您可以通过修改顶部 GLOBAL_CONFIG 中的编号快速调整视觉效果。
  */
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
         body {
             min-width: 200px;
             max-width: ${GLOBAL_CONFIG.maxWidth} !important; /* 对应编号 ③ */
-            margin: 15px auto !important;
+            margin: 10px auto !important;
             font-size: 16px;
             font-family: sans-serif;
             line-height: 1.25;
