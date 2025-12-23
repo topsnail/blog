@@ -1,5 +1,5 @@
 /**
- * 博客主题切换脚本 (theme.js) - 终极优化版
+ * 博客主题切换脚本 (theme.js) - 移除标题自定义样式版
  */
 document.addEventListener('DOMContentLoaded', function() {    
     const currentUrl = window.location.pathname;
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 【2. 逻辑处理区】仅负责拼接字符串，不操作 DOM
     // ==============================================================================
     
-    // 公共基础样式 (含手机端隐藏标题逻辑)
+    // 公共基础样式 (已移除标题相关控制)
     let finalCss = `
         html { background: url('${GLOBAL_CONFIG.bgUrl}') no-repeat center center fixed !important; background-size: cover !important; }
         body { 
@@ -35,15 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .SideNav { background: rgba(255, 255, 255, 0.6); border-radius: ${GLOBAL_CONFIG.borderRadius}; }
         .SideNav-item { transition: ${GLOBAL_CONFIG.transition}; }
         .LabelTime { display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-left: 8px !important; }
-        
-        /* 移动端标题隐藏 */
-        @media (max-width: 767px) { .blogTitle { display: none !important; } }
     `;
 
     // 页面差异化样式拼接
     if (currentUrl === '/' || currentUrl.includes('/index.html') || currentUrl.includes('/page')) {
         finalCss += `
-            .blogTitle { display: unset; }
             .SideNav-item:hover { background-color: ${GLOBAL_CONFIG.hoverColor}; transform: scale(1.02); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
         `;
     } 
