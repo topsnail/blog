@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>发票批量打印助手 - 极速合版</title>
+    <title>发票批量打印助手</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -13,10 +13,10 @@
             /* 流光动态背景 */
             background: linear-gradient(-45deg, #4a6d7c, #8da383, #8a6a9c, #d18a66, #147a61);
             background-size: 400% 400%;
-            animation: gradientBG 22s ease infinite;
+            animation: gradientBG 20s ease infinite;
             background-attachment: fixed;
             min-height: 100vh;
-            padding: 30px;
+            padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             transition: animation-duration 0.5s;
         }
@@ -28,24 +28,25 @@
         }
 
         /* 毛玻璃主卡片 */
-        。main-card {
+        .main-card {
             width: 100%; max-width: 900px;
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(255, 255, 255, 0.7); 
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-radius: 32px; padding: 40px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative; /* 为弹窗定位准备 */
         }
 
         .header h1 { 
-            color: #2c3e50; text-align: center; margin-bottom: 30px; 
-            font-size: 26px; font-weight: 800; letter-spacing: 2px;
+            color: #2c3e50; text-align: center; margin-bottom: 5px; 
+            font-size: 26px; font-weight: 800; letter-spacing: 3px;
         }
 
         /* 交互式拖拽区 */
         .drop-zone {
             border: 2px dashed #4a6d7c; background: rgba(255, 255, 255, 0.4); 
-            padding: 50px 20px; border-radius: 24px; text-align: center; 
+            padding: 10px 20px 20px 20px; border-radius: 24px; text-align: center; 
             cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .drop-zone:hover { 
@@ -61,23 +62,23 @@
 
         /* 设置面板 */
         .settings-panel {
-            display: flex; flex-wrap: wrap; gap: 20px; 
+            display: flex; flex-wrap: wrap; gap: 15px; 
             margin: 30px 0; padding: 25px; 
             background: rgba(223, 230, 237, 0.7); 
             border-radius: 24px; align-items: center; justify-content: space-between;
         }
 
-        .setting-unit { display: flex; align-items: center; gap: 12px; }
+        .setting-unit { display: flex; align-items: center; gap: 8px; }
         .unit-label { font-size: 14px; color: #2c3e50; font-weight: 700; }
 
         .toolbar { 
             display: flex; justify-content: center; flex-wrap: wrap;
-            gap: 15px; margin-bottom: 30px; 
+            gap: 15px; margin-bottom: 25px; align-items: center;
         }
         
         /* 按钮美化 */
         .btn { 
-            padding: 12px 24px; border-radius: 50px; border: none; 
+            padding: 12px 18px; border-radius: 10px; border: none; 
             font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 14px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
@@ -96,7 +97,32 @@
 
         .btn:disabled { background-color: #cbd5e0 !important; cursor: not-allowed; opacity: 0.6; }
 
-        /* 预览区域 */
+        /* ✨ 悬浮说明按钮与弹窗样式 */
+        .help-container { position: relative; display: flex; align-items: center; margin-left: 25px;}
+        .help-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #4a6d7c; color: white; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: help; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .help-btn:hover { background: #147a61; transform: scale(1.1); }
+
+        .help-popover {
+            position: absolute; bottom: 50px; right: 0; width: 320px;
+            background: white; border-radius: 18px; padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            visibility: hidden; opacity: 0; transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100; pointer-events: none;
+            line-height: 1.6; border: 1px solid #eee;
+        }
+        .help-container:hover .help-popover { visibility: visible; opacity: 1; transform: translateY(0); }
+        .help-popover h3 { color: #147a61; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .help-popover section { margin-bottom: 12px; }
+        .help-popover p { font-size: 13px; color: #4a5a6a; margin-bottom: 4px; }
+        .help-popover b { color: #2c3e50; }
+
+        /* 预览区域保持原样 */
         #previewGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
         .preview-page { 
             background: white; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
@@ -104,8 +130,8 @@
         }
         .preview-page:hover { transform: translateY(-5px); }
 
-        .v-page { aspect-ratio: 210/297; width: 100%; } 
-        .h-page { aspect-ratio: 297/210; width: 100%; }
+        .v-page { aspect-ratio: 210/297; width: 100%; }
+        .h-page { aspect-ratio: 297/210; width: 100%; } 
         
         .line-h, .line-v { display: none; pointer-events: none; z-index: 10; }
         .show-lines .line-h { display: block; position: absolute; left: 0; top: 50%; width: 100%; border-top: 1px dashed rgba(0,0,0,0.2); }
@@ -114,12 +140,11 @@
         .slot { position: absolute; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .slot img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* 打印适配优化 */
         @media print {
             @page { size: auto; margin: 0; }
             body { background: none !important; padding: 0 !important; margin: 0 !important; }
             .main-card { box-shadow: none !important; border: none !important; padding: 0 !important; max-width: none !important; width: 100% !important; background: none !important; }
-            .header, .drop-zone, .progress-wrapper, .settings-panel, .toolbar { display: none !important; }
+            .header, .drop-zone, .progress-wrapper, .settings-panel, .toolbar, .help-container { display: none !important; }
             #previewGrid { display: block !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
             .preview-page { margin: 0 !important; border: none !important; page-break-after: always !important; page-break-inside: avoid !important; }
             .v-page { width: 210mm !important; height: 297mm !important; }
@@ -133,10 +158,10 @@
     <div class="header"><h1>发票批量打印助手</h1></div>
 
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
-        <p style="font-size: 40px; margin-bottom: 15px;">📥</p>
+        <p style="font-size: 50px; margin-bottom: 15px;">📥</p>
         <p style="font-weight: 600; color: #2c3e50;">将 PDF 电子发票拖入此处</p>
-        <p style="font-size: 13px; color: #7f8c8d; mt: 5px;">或 <span style="color: #4a6d7c; text-decoration: underline;">点击上传</span>（支持多选）</p>
-        <p style="font-size: 13px; color: #7f8c8d; mt: 5px;">或 <span style="color: #4a6d7c; text-decoration: underline;">点击上传</span>（支持多选）</p>
+		<p style="font-size: 15px; color: #7f8c8d; margin-top: 15px;">或 <span style="color: #4a6d7c; text-decoration: underline; font-weight: bold;">点击上传</span>（支持多选）</p>
+		<p style="font-size: 13px; color: #7f8c8d; margin-top: 15px;">✨目前仅支持 PDF 格式✨</p>
         <input type="file" id="fileIn" accept="application/pdf" multiple style="display:none;">
     </div>
 
@@ -148,8 +173,8 @@
     <div class="settings-panel">
         <div class="setting-unit">
             <span class="unit-label">🧩 布局:</span>
-            <button class="btn btn-mode" id="m2" onclick="setMode(2)">一页两张</button>
-            <button class="btn btn-mode active" id="m4" onclick="setMode(4)">一页四张</button>
+            <button class="btn btn-mode" id="m2" onclick="setMode(2)">1页2张票</button>
+            <button class="btn btn-mode active" id="m4" onclick="setMode(4)">一页4张票</button>
         </div>
         
         <div class="setting-unit">
@@ -158,7 +183,7 @@
         </div>
 
         <div class="setting-unit" style="flex: 1; max-width: 220px;">
-            <span class="unit-label">📏 边距: <b id="marginVal">6</b>mm</span>
+            <span class="unit-label">📏 边距: <b id="marginVal"> 6 </b>（默认6mm）</span>
             <input type="range" min="0" max="12" value="6" id="marginRange" oninput="updateMargin(this.value)" style="width:100%; cursor: pointer;">
         </div>
     </div>
@@ -173,32 +198,62 @@
         <button class="btn btn-clear" onclick="location.reload()">
             <span>🧹</span> 清空重置
         </button>
+        
+        <div class="help-container">
+            <div class="help-btn">💡</div>
+            <div class="help-popover">
+                <h3>📘 使用指南</h3>
+                <section>
+                    <p><b>1. 导入：</b>批量选中 PDF 发票拖入或点击上传。</p>
+                    <p><b>2. 布局：</b>可选“1页2张票”或“1页4张票”模式。</p>
+                    <p><b>3. 边距：</b>打印内容如被切掉，请调大边距。</p>
+                </section>
+                <section>
+                    <p><b>💡 打印建议：</b></p>
+                    <p>在打印预览界面，请将“边距”设为<b>无或默认</b>，“缩放”设为<b>100%或默认</b>。</p>
+                </section>
+                <section style="margin-bottom:0;">
+                    <p style="font-size:12px; opacity:0.8;">🔒 <b>隐私安全：</b>所有处理均在本地浏览器内完成，绝不上传服务器，断网也能用。</p>
+                </section>
+            </div>
+        </div>
     </div>
 
     <div id="previewGrid"></div>
 </div>
 
 <script>
+    // ===================== 核心可配置参数保持不变 =====================
+    const CONFIG = {
+        PDF_RENDER_SCALE: 2.5,
+        IMAGE_QUALITY: 0.85,
+        DEFAULT_LAYOUT_MODE: 4,
+        DEFAULT_MARGIN: 6,
+        MARGIN_RANGE_MIN: 0,
+        MARGIN_RANGE_MAX: 12,
+        BACKGROUND_ANIM_SPEED: 20,
+        PROCESS_ANIM_SPEED: 2,
+        EXPORT_DELAY: 150,
+        PDF_EXPORT_QUALITY: 'FAST',
+        FILE_NAME_PREFIX: '发票合版_'
+    };
+
     const { jsPDF } = window.jspdf;
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     
     let invoiceFiles = [];
-    let currentMode = 4;
-    let currentMargin = 6;
+    let currentMode = CONFIG.DEFAULT_LAYOUT_MODE;
+    let currentMargin = CONFIG.DEFAULT_MARGIN;
     let showLines = true;
 
     async function handleFiles(files) {
         const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf');
         if (pdfFiles.length === 0) return;
-        
-        // 视觉反馈：背景流光加速
-        document.body.style.animationDuration = '3s';
-        
+        document.body.style.animationDuration = `${CONFIG.PROCESS_ANIM_SPEED}s`;
         const pw = document.getElementById('pw');
         const bar = document.getElementById('pb');
         const status = document.getElementById('ps');
         pw.style.display = 'block';
-        
         for (let i = 0; i < pdfFiles.length; i++) {
             status.innerText = `处理中: 第 ${i + 1} / ${pdfFiles.length} 张`;
             try {
@@ -208,28 +263,23 @@
                     cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', 
                     cMapPacked: true
                 }).promise;
-                
                 const page = await pdf.getPage(1);
-                const viewport = page.getViewport({scale: 2.5}); 
+                const viewport = page.getViewport({scale: CONFIG.PDF_RENDER_SCALE}); 
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                
                 await page.render({canvasContext: ctx, viewport, intent: 'print'}).promise;
-                invoiceFiles.push(canvas.toDataURL('image/jpeg', 0.85));
+                invoiceFiles.push(canvas.toDataURL('image/jpeg', CONFIG.IMAGE_QUALITY));
                 bar.style.width = ((i+1)/pdfFiles.length*100) + '%';
-                
                 canvas.width = 0; canvas.height = 0; 
             } catch (err) { 
                 console.error("解析文件失败:", pdfFiles[i].name, err);
-                status.innerText = `跳过无法解析的文件...`;
+                status.innerText = `跳过无法解析的文件: ${pdfFiles[i].name}`;
             }
         }
-        
         render();
-        // 恢复背景流光速度
-        document.body.style.animationDuration = '22s';
+        document.body.style.animationDuration = `${CONFIG.BACKGROUND_ANIM_SPEED}s`;
         setTimeout(() => pw.style.display = 'none', 800);
     }
 
@@ -244,7 +294,11 @@
     document.getElementById('fileIn').onchange = e => handleFiles(e.target.files);
 
     function setMode(m) { currentMode = m; render(); }
-    function updateMargin(v) { currentMargin = parseInt(v); document.getElementById('marginVal').innerText = v; render(); }
+    function updateMargin(v) { 
+        currentMargin = parseInt(v); 
+        document.getElementById('marginVal').innerText = v; 
+        render(); 
+    }
     function toggleLines() {
         showLines = !showLines;
         const btn = document.getElementById('lineToggle');
@@ -257,18 +311,20 @@
         const grid = document.getElementById('previewGrid');
         grid.innerHTML = '';
         if (invoiceFiles.length === 0) return;
-        
         document.getElementById('exportBtn').disabled = false;
         document.getElementById('printBtn').disabled = false;
-        
         const pages = Math.ceil(invoiceFiles.length / currentMode);
         for (let p = 0; p < pages; p++) {
             const pageDiv = document.createElement('div');
             pageDiv.className = `preview-page ${currentMode === 2 ? 'v-page' : 'h-page'} ${showLines ? 'show-lines' : ''}`;
-            
-            const lh = document.createElement('div'); lh.className = 'line-h'; pageDiv.appendChild(lh);
-            if(currentMode === 4) { const lv = document.createElement('div'); lv.className = 'line-v'; pageDiv.appendChild(lv); }
-            
+            const lh = document.createElement('div'); 
+            lh.className = 'line-h'; 
+            pageDiv.appendChild(lh);
+            if(currentMode === 4) { 
+                const lv = document.createElement('div'); 
+                lv.className = 'line-v'; 
+                pageDiv.appendChild(lv); 
+            }
             for (let s = 0; s < currentMode; s++) {
                 const idx = p * currentMode + s;
                 if (idx >= invoiceFiles.length) break;
@@ -297,36 +353,33 @@
         const status = document.getElementById('ps');
         pw.style.display = 'block';
         status.innerText = "正在合成高清 PDF...";
-
         setTimeout(() => {
-            const doc = new jsPDF(currentMode === 2 ? 'p' : 'l', 'mm', 'a4');
+            const doc = new jsPDF({
+                orientation: currentMode === 2 ? 'p' : 'l',
+                unit: 'mm',
+                format: 'a4'
+            });
             const m = currentMargin;
-            
             for (let i = 0; i < invoiceFiles.length; i++) {
                 if (i > 0 && i % currentMode === 0) doc.addPage();
                 const s = i % currentMode;
                 let x, y, sw, sh;
-                
                 if (showLines) {
-                    doc.setDrawColor(180); doc.setLineDashPattern([2, 2], 0);
+                    doc.setDrawColor(170);
+                    doc.setLineDashPattern([2, 2], 0);
                     if (currentMode === 2) { doc.line(0, 148.5, 210, 148.5); } 
                     else { doc.line(148.5, 0, 148.5, 210); doc.line(0, 105, 297, 105); }
                 }
-                
                 if (currentMode === 2) { sw = 210; sh = 148.5; x = 0; y = s === 0 ? 0 : 148.5; } 
                 else { sw = 148.5; sh = 105; x = (s === 1 || s === 3) ? 148.5 : 0; y = s < 2 ? 0 : 105; }
-                doc.addImage(invoiceFiles[i], 'JPEG', x + m, y + m, sw - (m*2), sh - (m*2), undefined, 'FAST');
+                doc.addImage(invoiceFiles[i], 'JPEG', x + m, y + m, sw - (m*2), sh - (m*2), undefined, CONFIG.PDF_EXPORT_QUALITY);
             }
-            
             const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + 
-                            now.getMinutes().toString().padStart(2, '0');
-            doc.save(`发票合版_${timeStr}.pdf`);
-            
+            const timeStr = now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0');
+            doc.save(`${CONFIG.FILE_NAME_PREFIX}${timeStr}.pdf`);
             pw.style.display = 'none';
-        }, 150);
+        }, CONFIG.EXPORT_DELAY);
     }
 </script>
 </body>
-
 </html>
