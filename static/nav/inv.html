@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发票批量打印助手</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-speed: 20s; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(-45deg, #4a6d7c, #8da383, #8a6a9c, #d18a66, #147a61);
+            background-size: 400% 400%;
+            animation: gradientBG var(--bg-speed) ease infinite;
+            background-attachment: fixed;
+            min-height: 100vh; 
+            padding: 12px 20px 20px 20px; 
+            display: flex; 
+            justify-content: center;
+            align-items: flex-start; 
+            transition: all 0.1s ease;
+        }
+
+        body.mode-2 { }
+        body.mode-4 { }
+
+        @keyframes gradientBG { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
+        }
+
+        .main-card {
+            width: 100%; 
+            max-width: 1050px;
+            background: rgba(235, 230, 230, 0.75); 
+            backdrop-filter: blur(15px); 
+            border-radius: 12px; 
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+
+        .header h1 { 
+            color: #2c3e50; 
+            text-align: center; 
+            font-size: 24px; 
+            padding-bottom: 6px;
+            margin-bottom: 12px; 
+            letter-spacing: 2px; 
+            font-weight: 600; 
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .top-layout { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+            align-items: stretch; 
+        }
+        
+        .drop-zone-container { 
+            flex: 1.2; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        
+        .drop-zone {
+            flex: 1; 
+            border: 0.5px dashed #4a6d7c; 
+            border-radius: 12px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            padding: 25px; 
+            cursor: pointer; 
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+        
+        .drop-zone:hover { 
+            background: rgba(255, 255, 255, 0.5); 
+            transform: translateY(-2px);
+        }
+        
+        .upload-icon { 
+            font-size: 40px; 
+            color: #4a6d7c; 
+            margin-bottom: 10px; 
+        }
+        
+        .upload-text { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: #2c3e50; 
+            margin-bottom: 8px; 
+        }
+        
+        .upload-subtext { 
+            font-size: 14px; 
+            color: #576574; 
+        }
+        
+        .upload-subtext span { 
+            color: #b97980; 
+            text-decoration: underline; 
+        }
+        
+        .upload-limit { 
+            font-size: 12px; 
+            color: #576574; 
+            margin-top: 12px; 
+        }
+
+        #feedbackArea { 
+            display: none; 
+            text-align: center; 
+        }
+        
+        .success-msg { 
+            color: #147a61; 
+            font-size: 22px; 
+            font-weight: 700; 
+            margin-bottom: 24px; 
+        }
+        
+        .reset-hint { 
+            color: #e67e22; 
+            font-size: 18px; 
+            font-weight: 500; 
+        }
+
+        .progress-wrapper { 
+            position: relative; 
+            height: 24px; 
+            background: rgba(0, 0, 0, 0.1); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            display: none; 
+        }
+        
+        .progress-bar { 
+            height: 100%; 
+            width: 0%; 
+            background: linear-gradient(90deg, #77b282, #429852, #0c7820);
+            transition: width 0.8s ease;
+        }
+        
+        .progress-text { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            top: 0; 
+            left: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: 500; 
+            color: #ffffff; 
+            pointer-events: none; 
+        }
+
+        .settings-panel { 
+            flex: 1; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
+        
+        .setting-unit { 
+            background: rgba(170, 180, 180, 0.75); 
+            border-radius: 12px; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+        }
+        
+        .setting-unit:hover {
+            transform: translateY(-2px);
+        }
+        
+        .unit-full { 
+            grid-column: span 2; 
+        }
+        
+        .unit-header { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #2c3e50; 
+            margin-bottom: 8px; 
+        }
+
+        .toggle-btn { 
+            width: 70%; 
+            height: 35px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.1s ease; 
+        }
+        
+        .btn-on { 
+            background: #6b9c70; 
+            color: white; 
+        }
+        
+        .btn-off { 
+            background: #cbd5e1; 
+            color: #64748b; 
+        }
+
+        input[type="range"] { 
+            width: 100%; 
+            cursor: pointer; 
+            accent-color: #0066b2; 
+        }
+        
+        .mode-group { 
+            display: flex; 
+            gap: 20px; 
+            width: 90%; 
+        }
+        
+        .btn-mode { 
+            flex: 1; 
+            height: 38px; 
+            border-radius: 12px; 
+            border: 1px solid #cbd5e1; 
+            background: #cbd5e1; 
+            color: #4a6d7c; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.1s ease;
+        }
+        
+        .btn-mode:hover {
+            border-color: #4a6d7c;
+        }
+        
+        .btn-mode.active { 
+            background: #6b9c70; 
+            color: white; 
+            border-color: #4a6d7c; 
+        }
+
+        .toolbar { 
+            display: flex; 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+        
+        .btn-large { 
+            flex: 1; 
+            height: 52px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            color: white; 
+            transition: all 0.1s ease;
+        }
+        
+        .btn-large:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-pdf { 
+            background: #94a3b8; 
+        }
+        
+        .btn-print { 
+            background: #147a61; 
+        }
+        
+        .btn-reset { 
+            background: white; 
+            color: #64748b; 
+            border: 1px solid #cbd5e1; 
+        }
+        
+        .btn-reset:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        
+        .btn-large:disabled { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        #previewGrid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+        
+        .preview-page { 
+            background: white; 
+            position: relative; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            margin: 0 auto; 
+            overflow: hidden; 
+            transition: transform 0.1s ease;
+        }
+        
+        .preview-page:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .v-page { 
+            aspect-ratio: 210/297; 
+            width: 100%; 
+        } 
+        
+        .h-page { 
+            aspect-ratio: 297/210; 
+            width: 100%; 
+        } 
+        
+        .line-h, .line-v { 
+            position: absolute; 
+            pointer-events: none; 
+            z-index: 10; 
+            display: none; 
+            border: none;
+        }
+        
+        .line-h {
+            border-top: 0.5px dashed #e67e22;
+            top: 50%;
+            left: 0;
+            width: 100%;
+        }
+        
+        .line-v {
+            border-left: 0.5px dashed #e67e22;
+            left: 50%;
+            top: 0;
+            height: 100%;
+        }
+        
+        .show-lines .line-h { 
+            display: block;
+        }
+        
+        .show-lines.h-page .line-v { 
+            display: block;
+        }
+
+        .slot { 
+            position: absolute; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-sizing: border-box;
+        }
+        
+        .slot img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            display: block;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #previewGrid,
+            #previewGrid * {
+                visibility: visible;
+            }
+            
+            body.mode-2 .preview-page {
+                size: A4 portrait !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            body.mode-4 .preview-page {
+                size: A4 landscape !important;
+                size: 297mm 210mm !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            @page {
+                margin: 0;
+                size: auto;
+            }
+            
+            @page mode-2-page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            
+            @page mode-4-page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            
+            body.mode-2 .preview-page {
+                page: mode-2-page;
+            }
+            
+            body.mode-4 .preview-page {
+                page: mode-4-page;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: auto;
+                animation: none !important;
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            .main-card {
+                background: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: none !important;
+                backdrop-filter: none !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            .header,
+            .top-layout,
+            .toolbar,
+            .drop-zone-container,
+            .settings-panel,
+            .progress-wrapper,
+            .upload-icon,
+            .upload-text,
+            .upload-subtext,
+            .upload-limit {
+                display: none !important;
+            }
+            
+            #previewGrid {
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            
+            .preview-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                border: none !important;
+                overflow: visible !important;
+                transform: none !important;
+                position: relative !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .preview-page:last-child {
+                page-break-after: auto !important;
+            }
+        }
+        
+        .print-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .print-dialog-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .print-dialog h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        .print-dialog p {
+            color: #576574;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .print-dialog strong {
+            color: #e67e22;
+        }
+        
+        .print-dialog-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .print-dialog-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .print-dialog-confirm {
+            background: #147a61;
+            color: white;
+        }
+        
+        .print-dialog-confirm:hover {
+            background: #0d5d49;
+        }
+        
+        .print-dialog-cancel {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .print-dialog-cancel:hover {
+            background: #e2e8f0;
+        }
+        
+        .print-tip {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body id="theBody" class="mode-4">
+    <div class="print-dialog" id="printDialog">
+        <div class="print-dialog-content">
+            <h3>🖨️ 打印设置提示</h3>
+            <p>当前布局模式：<strong id="printModeText">1页4张(横向)</strong></p>
+            <p>请在打印设置中确认以下事项：</p>
+            <p>1. <strong>纸张方向</strong>：设置为 <strong id="printOrientationText">横向</strong></p>
+            <p>2. <strong>纸张大小</strong>：设置为 <strong>A4</strong></p>
+            <p>3. <strong>页边距</strong>：设置为 <strong>无</strong> 或 <strong>最小</strong></p>
+            <p class="print-tip">💡 提示：大多数浏览器会自动检测方向，但建议手动确认一下</p>
+            <div class="print-dialog-buttons">
+                <button class="print-dialog-btn print-dialog-confirm" id="confirmPrint">确认设置并打印</button>
+                <button class="print-dialog-btn print-dialog-cancel" id="cancelPrint">取消打印</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-card">
+        <div class="header"><h1>发票批量打印助手</h1></div>
+        
+        <div class="top-layout">
+            <div class="drop-zone-container">
+                <div id="dropZone" class="drop-zone" onclick="document.getElementById('fileIn').click()">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">将 PDF 电子发票拖入此处</div>
+                    <div class="upload-subtext">或 <span>点击上传</span> (支持多选)</div>
+                    <div class="upload-limit">✨ 目前仅支持 PDF 格式 ✨</div>
+                    <input type="file" id="fileIn" accept="application/pdf" multiple style="display:none;">
+                </div>
+                
+                <div id="feedbackArea" class="drop-zone">
+                    <div id="successInfo" class="success-msg"></div>
+                    <div class="reset-hint">💡 处理新的文件前请先点击 "清空重置" 💡</div>
+                </div>
+                
+                <div class="progress-wrapper" id="progressWrapper">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="progress-text" id="progressText">0 / 0</div>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                <div class="setting-unit">
+                    <div class="unit-header">✂️ 裁剪线</div>
+                    <button id="lineToggle" class="toggle-btn btn-on" onclick="toggleLines()">已开启</button>
+                </div>
+                
+                <div class="setting-unit">
+                    <div class="unit-header">📏 边距：<b id="marginVal">4</b>mm</div>
+                    <input type="range" min="2" max="10" value="4" id="marginRange" oninput="updateMargin(this.value)">
+                </div>
+                
+                <div class="setting-unit unit-full">
+                    <div class="unit-header">🧩 布局选择</div>
+                    <div class="mode-group">
+                        <button id="m2" class="btn-mode" onclick="setMode(2)">1页2张(纵向)</button>
+                        <button id="m4" class="btn-mode active" onclick="setMode(4)">1页4张(横向)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button id="exportBtn" class="btn-large btn-pdf" disabled onclick="savePDF()">💾 导出 PDF</button>
+            <button id="printBtn" class="btn-large btn-print" disabled onclick="showPrintDialog()">🖨️ 立即打印</button>
+            <button class="btn-large btn-reset" onclick="resetApp()">🧹 清空重置</button>
+        </div>
+        
+        <div id="previewGrid"></div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            PDF_RENDER_SCALE: 2.5,
+            IMAGE_QUALITY: 0.85,
+            DEFAULT_MARGIN: 2,
+            MAX_FILES: 50
+        };
+
+        const AppState = {
+            invoiceFiles: [],
+            currentMode: 4,
+            currentMargin: 4,
+            showLines: true,
+            isProcessing: false
+        };
+
+        const { jsPDF } = window.jspdf;
+        const pdfjsLib = window.pdfjsLib;
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        async function handleFiles(files) {
+            if (AppState.isProcessing) {
+                alert('正在处理文件中，请稍候...');
+                return;
+            }
+
+            const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf');
+            
+            if (!pdfFiles.length) {
+                alert('请选择PDF文件！');
+                return;
+            }
+
+            if (pdfFiles.length > CONFIG.MAX_FILES) {
+                alert(`最多支持${CONFIG.MAX_FILES}个文件，已自动截取前${CONFIG.MAX_FILES}个`);
+                pdfFiles.length = CONFIG.MAX_FILES;
+            }
+
+            AppState.isProcessing = true;
+            AppState.invoiceFiles = [];
+            
+            const progressWrapper = document.getElementById('progressWrapper');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressWrapper.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.innerText = `准备中...`;
+
+            try {
+                for (let i = 0; i < pdfFiles.length; i++) {
+                    progressText.innerText = `解析中 ${i + 1} / ${pdfFiles.length}`;
+                    
+                    try {
+                        const data = await pdfFiles[i].arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ 
+                            data, 
+                            cMapUrl: 'https://cdn.jsdelivr.net/npm/pdf.js@3.11.174/cmaps/',
+                            cMapPacked: true 
+                        }).promise;
+                        
+                        const page = await pdf.getPage(1);
+                        const viewport = page.getViewport({ scale: CONFIG.PDF_RENDER_SCALE });
+                        
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        
+                        await page.render({
+                            canvasContext: context,
+                            viewport: viewport
+                        }).promise;
+                        
+                        const imageData = canvas.toDataURL('image/jpeg', CONFIG.IMAGE_QUALITY);
+                        AppState.invoiceFiles.push(imageData);
+                        
+                        const progress = Math.round(((i + 1) / pdfFiles.length) * 100);
+                        progressBar.style.width = `${progress}%`;
+                        
+                        canvas.width = 0;
+                        canvas.height = 0;
+                        
+                    } catch (error) {
+                        console.error(`文件 ${pdfFiles[i].name} 处理失败:`, error);
+                        continue;
+                    }
+                }
+                
+                document.getElementById('dropZone').style.display = 'none';
+                document.getElementById('feedbackArea').style.display = 'flex';
+                document.getElementById('successInfo').innerText = `✅ 已成功加载 ${AppState.invoiceFiles.length} 张发票 ✨`;
+                
+                document.getElementById('exportBtn').disabled = false;
+                document.getElementById('printBtn').disabled = false;
+                
+                renderPreview();
+                
+            } catch (error) {
+                console.error('文件处理失败:', error);
+                alert('文件处理失败，请重试！');
+                resetApp();
+            } finally {
+                AppState.isProcessing = false;
+                progressWrapper.style.display = 'none';
+            }
+        }
+
+        function renderPreview() {
+            const grid = document.getElementById('previewGrid');
+            grid.innerHTML = '';
+            
+            if (!AppState.invoiceFiles.length) return;
+            
+            const totalPages = Math.ceil(AppState.invoiceFiles.length / AppState.currentMode);
+            
+            for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+                const pageDiv = document.createElement('div');
+                
+                const pageClass = AppState.currentMode === 2 ? 'v-page' : 'h-page';
+                const linesClass = AppState.showLines ? 'show-lines' : '';
+                pageDiv.className = `preview-page ${pageClass} ${linesClass}`;
+                
+                pageDiv.innerHTML = '<div class="line-h"></div><div class="line-v"></div>';
+                
+                for (let slotIndex = 0; slotIndex < AppState.currentMode; slotIndex++) {
+                    const fileIndex = pageIndex * AppState.currentMode + slotIndex;
+                    if (fileIndex >= AppState.invoiceFiles.length) break;
+                    
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    
+                    const margin = AppState.currentMargin;
+                    
+                    if (AppState.currentMode === 2) {
+                        slot.style.width = '100%';
+                        slot.style.height = '50%';
+                        slot.style.top = slotIndex === 0 ? '0' : '50%';
+                        slot.style.left = '0';
+                    } else {
+                        slot.style.width = '50%';
+                        slot.style.height = '50%';
+                        slot.style.top = slotIndex < 2 ? '0' : '50%';
+                        slot.style.left = slotIndex % 2 === 0 ? '0' : '50%';
+                    }
+                    
+                    slot.style.padding = `${margin}mm`;
+                    slot.innerHTML = `<img src="${AppState.invoiceFiles[fileIndex]}" alt="发票 ${fileIndex + 1}">`;
+                    
+                    pageDiv.appendChild(slot);
+                }
+                
+                grid.appendChild(pageDiv);
+            }
+            
+            updateModeButtons();
+        }
+
+        function updateMargin(value) {
+            AppState.currentMargin = parseInt(value);
+            document.getElementById('marginVal').innerText = value;
+            renderPreview();
+        }
+
+        function setMode(mode) {
+            if (AppState.currentMode === mode) return;
+            
+            AppState.currentMode = mode;
+            
+            const body = document.getElementById('theBody');
+            body.className = `mode-${mode}`;
+            
+            renderPreview();
+        }
+
+        function toggleLines() {
+            AppState.showLines = !AppState.showLines;
+            const btn = document.getElementById('lineToggle');
+            
+            btn.innerText = AppState.showLines ? '已开启' : '已关闭';
+            btn.className = `toggle-btn ${AppState.showLines ? 'btn-on' : 'btn-off'}`;
+            
+            renderPreview();
+        }
+
+        function updateModeButtons() {
+            document.getElementById('m2').classList.toggle('active', AppState.currentMode === 2);
+            document.getElementById('m4').classList.toggle('active', AppState.currentMode === 4);
+        }
+
+        async function savePDF() {
+            if (!AppState.invoiceFiles.length) return;
+            
+            try {
+                const orientation = AppState.currentMode === 2 ? 'portrait' : 'landscape';
+                
+                const doc = new jsPDF({
+                    orientation: orientation,
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const margin = AppState.currentMargin;
+                
+                for (let i = 0; i < AppState.invoiceFiles.length; i++) {
+                    if (i > 0 && i % AppState.currentMode === 0) {
+                        doc.addPage();
+                    }
+                    
+                    const slotIndex = i % AppState.currentMode;
+                    let x, y, slotWidth, slotHeight;
+                    
+                    if (AppState.currentMode === 2) {
+                        slotWidth = 210;
+                        slotHeight = 148.5;
+                        x = 0;
+                        y = slotIndex === 0 ? 0 : 148.5;
+                    } else {
+                        slotWidth = 148.5;
+                        slotHeight = 105;
+                        x = (slotIndex === 1 || slotIndex === 3) ? 148.5 : 0;
+                        y = slotIndex < 2 ? 0 : 105;
+                    }
+                    
+                    doc.addImage(
+                        AppState.invoiceFiles[i],
+                        'JPEG',
+                        x + margin,
+                        y + margin,
+                        slotWidth - (margin * 2),
+                        slotHeight - (margin * 2)
+                    );
+                    
+                    if (AppState.showLines && slotIndex === (AppState.currentMode - 1)) {
+                        doc.setDrawColor(120);
+                        doc.setLineWidth(0.1);
+                        
+                        doc.setLineDashPattern([2, 2], 0);
+                        
+                        if (AppState.currentMode === 2) {
+                            doc.line(0, 148.5, 210, 148.5);
+                        } else {
+                            doc.line(0, 105, 297, 105);
+                            doc.line(148.5, 0, 148.5, 210);
+                        }
+                        
+                        doc.setLineDashPattern([], 0);
+                    }
+                }
+                
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                doc.save(`发票合版_${timestamp}.pdf`);
+                
+            } catch (error) {
+                console.error('导出PDF失败:', error);
+                alert('导出PDF失败，请重试！');
+            }
+        }
+
+        function showPrintDialog() {
+            if (!AppState.invoiceFiles.length) return;
+            
+            const modeText = AppState.currentMode === 2 ? '1页2张(纵向)' : '1页4张(横向)';
+            const orientationText = AppState.currentMode === 2 ? '纵向' : '横向';
+            
+            document.getElementById('printModeText').textContent = modeText;
+            document.getElementById('printOrientationText').textContent = orientationText;
+            
+            document.getElementById('printDialog').style.display = 'flex';
+        }
+        
+        function hidePrintDialog() {
+            document.getElementById('printDialog').style.display = 'none';
+        }
+        
+        function handlePrint() {
+            if (!AppState.invoiceFiles.length) return;
+            
+            setTimeout(() => {
+                window.print();
+                
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 100);
+            }, 100);
+        }
+
+        function resetApp() {
+            if (AppState.isProcessing) {
+                if (!confirm('文件正在处理中，确定要重置吗？')) {
+                    return;
+                }
+            }
+            
+            AppState.invoiceFiles = [];
+            AppState.currentMargin = 4;
+            AppState.showLines = true;
+            AppState.isProcessing = false;
+            
+            document.getElementById('dropZone').style.display = 'flex';
+            document.getElementById('feedbackArea').style.display = 'none';
+            document.getElementById('previewGrid').innerHTML = '';
+            document.getElementById('exportBtn').disabled = true;
+            document.getElementById('printBtn').disabled = true;
+            document.getElementById('progressWrapper').style.display = 'none';
+            document.getElementById('marginRange').value = 4;
+            document.getElementById('marginVal').innerText = '4';
+            
+            document.getElementById('lineToggle').innerText = '已开启';
+            document.getElementById('lineToggle').className = 'toggle-btn btn-on';
+            
+            document.getElementById('fileIn').value = '';
+            
+            setMode(4);
+            
+            hidePrintDialog();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fileIn').addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+            
+            const dropZone = document.getElementById('dropZone');
+            
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropZone.style.background = 'rgba(255, 255, 255, 0.4)';
+                dropZone.style.borderColor = '#147a61';
+            });
+            
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dropZone.style.background = 'rgba(255, 255, 255, 0.2)';
+                dropZone.style.borderColor = '#4a6d7c';
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.style.background = 'rgba(255, 255, 255, 0.2)';
+                dropZone.style.borderColor = '#4a6d7c';
+                
+                if (e.dataTransfer.files.length) {
+                    handleFiles(e.dataTransfer.files);
+                }
+            });
+            
+            document.getElementById('confirmPrint').addEventListener('click', function() {
+                hidePrintDialog();
+                handlePrint();
+            });
+            
+            document.getElementById('cancelPrint').addEventListener('click', function() {
+                hidePrintDialog();
+            });
+            
+            document.getElementById('printDialog').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hidePrintDialog();
+                }
+            });
+            
+            updateModeButtons();
+        });
+    </script>
+</body>
+</html>
