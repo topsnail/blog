@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUrl = window.location.pathname;
 
     const GLOBAL_CONFIG = {
-        // 移除了 bgUrl，改为使用CSS渐变
         bodyBg: 'rgba(237, 239, 233, 0.85)',
         maxWidth: '885px',
         borderRadius: '10px',
@@ -12,30 +11,34 @@ document.addEventListener('DOMContentLoaded', function() {
         hoverColor: '#c3e4e3'
     };
 
-    // 移除了背景图片预加载函数，因为不再使用图片背景
-    // preloadBackgroundImage();
-
     let finalCss = `
-        /* 5色渐变呼吸背景 - 45度角，15秒周期 */
+        /* 5色渐变呼吸背景 - 45度角，15秒周期，增强版呼吸效果 */
         html { 
             background: linear-gradient(45deg, 
-                #e3f2fd 0%,      /* 柔和的淡蓝色 */
-                #f3e5f5 20%,     /* 浅紫色 */
-                #e8f5e9 40%,     /* 淡绿色 */
-                #fff3e0 60%,     /* 浅橙色 */
-                #fce4ec 80%,     /* 浅粉色 */
-                #e3f2fd 100%     /* 回到起始色形成循环 */
+                #e3f2fd,      /* 柔和的淡蓝色 */
+                #f3e5f5,      /* 浅紫色 */
+                #e8f5e9,      /* 淡绿色 */
+                #fff3e0,      /* 浅橙色 */
+                #fce4ec,      /* 浅粉色 */
+                #e3f2fd       /* 回到起始色形成循环 */
             ) !important;
-            background-size: 400% 400% !important;
+            background-size: 600% 600% !important;  /* 增大尺寸让动画更明显 */
             animation: gradientBreathing 15s ease infinite !important;
+            min-height: 100vh !important;
         }
         
         @keyframes gradientBreathing {
             0% {
                 background-position: 0% 50%;
             }
+            25% {
+                background-position: 50% 100%;
+            }
             50% {
                 background-position: 100% 50%;
+            }
+            75% {
+                background-position: 50% 0%;
             }
             100% {
                 background-position: 0% 50%;
@@ -47,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: 10px auto !important; font-family: sans-serif; line-height: 1.25;
             background: ${GLOBAL_CONFIG.bodyBg} !important; border-radius: ${GLOBAL_CONFIG.borderRadius} !important;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important; overflow: auto;
+            min-height: calc(100vh - 20px) !important;  /* 确保body填满屏幕 */
         }
         .SideNav { background: rgba(255, 255, 255, 0.6); border-radius: ${GLOBAL_CONFIG.borderRadius}; }
         .SideNav-item { transition: ${GLOBAL_CONFIG.transition}; }
@@ -66,6 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
 
+    // ... [剩余代码保持不变，包括页面路径判断、标签页搜索、图片懒加载等]
+    
     if (currentUrl === '/' || currentUrl.includes('/index.html') || currentUrl.includes('/page')) {
         finalCss += `
             .SideNav-item:hover { background-color: ${GLOBAL_CONFIG.hoverColor}; transform: scale(1.02); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
