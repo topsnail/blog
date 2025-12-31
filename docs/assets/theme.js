@@ -2,32 +2,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUrl = window.location.pathname;
 
     const GLOBAL_CONFIG = {
-        // 你选定的五种呼吸颜色
-        colors: [-45deg '#9ac47a', '#A3B18A', '#D9AD98', '#A5A5C1', '#C9B380'],
-        bodyBg: 'rgba(237, 239, 233, 0.85)',
+        // 您提供的五种核心颜色
+        colors: ['#9ac47a', '#A3B18A', '#D9AD98', '#A5A5C1', '#C9B380'],
+        bodyBg: 'rgba(237, 239, 233, 0.7)',
         maxWidth: '885px',
         borderRadius: '10px',
         transition: '0.2s ease-out',
         accentColor: 'rgb(239, 112, 96)',
-        codeBg: 'rgba(243, 244, 243, 0.97)',
+        codeBg: 'rgba(243, 244, 243, 0.9)',
         hoverColor: '#c3e4e3'
     };
 
     let finalCss = `
-     /* 定义带角度的渐变呼吸动画 */
-@keyframes breatheBackground {
-    0%   { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[0]}, #ffffff); }
-    25%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[1]}, #ffffff); }
-    50%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[2]}, #ffffff); }
-    75%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[3]}, #ffffff); }
-    100% { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[4]}, #ffffff); }
-}
+        /* 定义135度双色交替渐变呼吸动画 */
+        @keyframes breatheGradient {
+            0%   { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[0]}, ${GLOBAL_CONFIG.colors[1]}); }
+            25%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[1]}, ${GLOBAL_CONFIG.colors[2]}); }
+            50%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[2]}, ${GLOBAL_CONFIG.colors[3]}); }
+            75%  { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[3]}, ${GLOBAL_CONFIG.colors[4]}); }
+            100% { background-image: linear-gradient(135deg, ${GLOBAL_CONFIG.colors[4]}, ${GLOBAL_CONFIG.colors[0]}); }
+        }
 
-html { 
-    animation: breatheBackground 15s infinite alternate ease-in-out !important; 
-    min-height: 100%;
-    background-attachment: fixed; /* 确保背景不随滚动条滚动 */
-}
+        html { 
+            /* 15秒周期，无限往返循环，平滑过渡 */
+            animation: breatheGradient 15s infinite alternate ease-in-out !important; 
+            min-height: 100vh;
+            background-attachment: fixed !important; /* 确保滚动时背景固定 */
+        }
 
         body { 
             min-width: 200px; max-width: ${GLOBAL_CONFIG.maxWidth} !important; 
@@ -54,7 +55,7 @@ html {
     `;
 
     // 路由逻辑样式注入
-    if (currentUrl === '/' || currentUrl.includes('/index.html') || currentUrl.includes('/page')) {
+    if (currentUrl === '/' || currentUrl.includes('/index.html') || currentUrl。includes('/page')) {
         finalCss += `
             .SideNav-item:hover { background-color: ${GLOBAL_CONFIG.hoverColor}; transform: scale(1.02); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
         `;
@@ -104,7 +105,7 @@ html {
     style.innerHTML = finalCss;
     document.head.appendChild(style);
 
-    // 图片懒加载与错误处理逻辑
+    // 图片懒加载与错误处理
     const initImageLazyLoad = () => {
         const images = document.querySelectorAll('.markdown-body img');
         images.forEach(img => {
