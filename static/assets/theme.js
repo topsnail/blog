@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentUrl === '/' || currentUrl.includes('/index.html') || currentUrl.includes('/page')) {
         finalCss += `
             html { min-height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+            body { flex-shrink: 0 !important; width: ${GLOBAL_CONFIG.maxWidth} !important; max-width: ${GLOBAL_CONFIG.maxWidth} !important; }
             .SideNav-item:hover { background-color: ${GLOBAL_CONFIG.hoverColor}; transform: scale(1.02); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
         `;
     } 
