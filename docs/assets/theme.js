@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const GLOBAL_CONFIG = {
         bgUrl: '/bj2.webp',
         bodyBg: 'rgba(237, 239, 233, 0.85)',
-        maxWidth: '1050px',
+        maxWidth: '885px',
         borderRadius: '10px',
         transition: '0.2s ease-out',
         accentColor: 'rgb(239, 112, 96)',
@@ -62,10 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .markdown-body img { transition: ${GLOBAL_CONFIG.transition} !important; }
         .markdown-body a { color: ${GLOBAL_CONFIG.accentColor}; transition: color ${GLOBAL_CONFIG.transition} !important; }
         .markdown-body a:hover { color: #d65a47 !important; }
-        @media (min-width: 1100px) {
+        @media (min-width: 900px) {
             body { max-width: ${GLOBAL_CONFIG.maxWidth} !important; }
         }
-        @media (min-width: 768px) and (max-width: 1099px) {
+        @media (min-width: 768px) and (max-width: 899px) {
             body { max-width: calc(100% - 40px) !important; }
             .SideNav { margin: 0 16px !important; }
         }
@@ -153,6 +153,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const style = document.createElement("style");
     style.innerHTML = finalCss;
+    style.setAttribute('data-theme', 'gmeek-custom');
+    // 确保样式在head的最后，覆盖HTML内联样式
     document.head.appendChild(style);
 
     const enhanceRobustness = () => {
