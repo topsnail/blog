@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const GLOBAL_CONFIG = {
         bgUrl: '/bj2.webp',
         bodyBg: 'rgba(237, 239, 233, 0.85)',
-        maxWidth: '885px',
+        maxWidth: '1050px',
         borderRadius: '10px',
         transition: '0.2s ease-out',
         accentColor: 'rgb(239, 112, 96)',
@@ -12,21 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         hoverColor: '#c3e4e3'
     };
 
-    const preloadBackgroundImage = () => {
-        const bgImg = new Image();
-        bgImg.src = GLOBAL_CONFIG.bgUrl;
-        
-        bgImg.onerror = () => {
-            const fallbackStyle = document.createElement('style');
-            fallbackStyle.innerHTML = `
-                html { 
-                    background: #e9ebe5 !important;
-                }
-            `;
-            document.head.appendChild(fallbackStyle);
-        };
-    };
-    preloadBackgroundImage();
+    // 背景使用渐变呼吸灯效果，不再使用背景图片
+    // preloadBackgroundImage 函数保留但不执行，避免影响渐变动画
 
     let finalCss = `
         @keyframes gradientBreathing {
@@ -63,7 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .markdown-body img { transition: ${GLOBAL_CONFIG.transition} !important; }
         .markdown-body a { color: ${GLOBAL_CONFIG.accentColor}; transition: color ${GLOBAL_CONFIG.transition} !important; }
         .markdown-body a:hover { color: #d65a47 !important; }
-        @media (min-width: 768px) and (max-width: 1024px) {
+        @media (min-width: 1200px) {
+            body { max-width: ${GLOBAL_CONFIG.maxWidth} !important; }
+        }
+        @media (min-width: 768px) and (max-width: 1199px) {
             body { max-width: 90% !important; }
             .SideNav { margin: 0 16px !important; }
         }
@@ -74,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 padding-bottom: 10px !important;
             }
             body { 
+                max-width: calc(100% - 20px) !important;
                 margin: 10px auto !important;
             }
         }
