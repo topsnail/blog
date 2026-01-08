@@ -52,29 +52,43 @@ document.addEventListener('DOMContentLoaded', function() {
             body { max-width: 90% !important; }
             .SideNav { margin: 0 16px !important; }
         }
-        /* 新增手机端适配规则（767px及以下） */
         @media (max-width: 767px) {
+            html { 
+                align-items: flex-start !important;
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
             body { 
-                max-width: 95% !important; /* 手机端占屏幕95%宽度，避免过窄 */
-                width: 95% !important; /* 主页场景下同步宽度 */
-                margin: 5px auto !important; /* 减少上下边距，适配小屏 */
-                padding: 10px !important; /* 增加内边距，避免内容贴边 */
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important; /* 弱化阴影，适配小屏 */
+                max-width: calc(100% - 20px) !important;
+                margin: 10px auto !important;
+                padding: 15px !important;
+                font-size: 14px !important;
             }
             .SideNav { 
-                margin: 0 8px !important; /* 侧边栏减少左右边距 */
-                padding: 5px !important; /* 侧边栏内边距适配 */
+                margin: 0 !important;
             }
-            .markdown-body pre { 
-                padding: 10px !important; /* 代码块内边距适配 */
-                font-size: 14px !important; /* 代码字体缩小，适配小屏 */
+            .SideNav-item {
+                padding: 12px 8px !important;
             }
-            .markdown-body h1 { 
-                padding: 2px 8px 1px !important; /* 标题内边距适配 */
-                font-size: 1.5em !important; /* 标题字体缩小，适配小屏 */
+            .markdown-body {
+                font-size: 14px !important;
             }
-            .post-item { 
-                margin: 10px 0 !important; /* 文章项间距适配 */
+            .markdown-body img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            .markdown-body pre, .markdown-body code {
+                font-size: 12px !important;
+                overflow-x: auto !important;
+            }
+            .markdown-body h1 {
+                font-size: 20px !important;
+            }
+            .markdown-body h2 {
+                font-size: 18px !important;
+            }
+            .markdown-body h3 {
+                font-size: 16px !important;
             }
         }
     `;
@@ -84,6 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
             html { min-height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; }
             body { flex-shrink: 0 !important; width: ${GLOBAL_CONFIG.maxWidth} !important; max-width: ${GLOBAL_CONFIG.maxWidth} !important; }
             .SideNav-item:hover { background-color: ${GLOBAL_CONFIG.hoverColor}; transform: scale(1.02); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+            @media (max-width: 767px) {
+                html { align-items: flex-start !important; padding-top: 10px !important; }
+                body { width: calc(100% - 20px) !important; max-width: calc(100% - 20px) !important; margin: 10px auto !important; }
+            }
         `;
     } 
     else if (currentUrl.includes('/post/') || currentUrl.includes('/link.html') || currentUrl.includes('/about.html')) {
